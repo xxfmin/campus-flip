@@ -44,15 +44,15 @@ const AccountItem = ({ icon, title, subtitle, onPress }: AccountItemProps) => {
 };
 
 const Account = () => {
-  const { user, refetch } = useGlobalContext();
-  
+  const { user, profile, refetch } = useGlobalContext();
+
   const handleLogout = async () => {
     const result = await auth.signOut();
-    
-    if(result) {
-      Alert.alert("Success", "You have been logged out")
+
+    if (result) {
+      Alert.alert("Success", "You have been logged out");
     } else {
-      Alert.alert("Error", "An error occured while logging out")
+      Alert.alert("Error", "An error occured while logging out");
     }
   };
 
@@ -68,7 +68,10 @@ const Account = () => {
         </TouchableOpacity>
         <TouchableOpacity className="flex flex-col pl-4 justify-center">
           <Text className="text-2xl font-worksans-bold text-blue">
-            Felipe Min
+            {profile?.name ||
+              (user?.user_metadata?.first_name && user?.user_metadata?.last_name
+                ? `${user.user_metadata.first_name} ${user.user_metadata.last_name}`
+                : user?.email || "User")}
           </Text>
           <Text className="text-sm font-worksans">View profile 〉</Text>
         </TouchableOpacity>

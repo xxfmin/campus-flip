@@ -74,7 +74,7 @@ const SignUp = () => {
 
       if (result.data) {
         setMessage(
-          "Account created successfully! Please check your email to verify your account."
+          "Account created successfully! Your profile has been set up. Please check your email to verify your account."
         );
 
         // Clear form
