@@ -17,7 +17,7 @@ const SignIn = () => {
 
   // Redirect if user is already logged in
   if (!loading && isLoggedIn) {
-    return <Redirect href="/" />;
+    return <Redirect href="/(root)/(tabs)" />;
   }
 
   const handleLogin = async () => {
@@ -53,7 +53,8 @@ const SignIn = () => {
       }
 
       if (result.data) {
-        router.push("/");
+        await refetch();
+        router.replace("/(root)/(tabs)");
       }
     } catch (err) {
       console.error("Login error:", err);

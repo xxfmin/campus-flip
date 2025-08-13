@@ -2,6 +2,7 @@ import icons from "@/constants/icons";
 import images from "@/constants/images";
 import { useGlobalContext } from "@/utils/global-provider";
 import { auth } from "@/utils/supabase";
+import { router } from "expo-router";
 import React from "react";
 import {
   Alert,
@@ -49,17 +50,18 @@ const Account = () => {
   const handleLogout = async () => {
     const result = await auth.signOut();
 
-    if (result) {
-      Alert.alert("Success", "You have been logged out");
-    } else {
+    if (result.error) {
       Alert.alert("Error", "An error occured while logging out");
+    } else {
+      await refetch();
+      router.replace("/(auth)/signin");
     }
   };
 
   return (
     <SafeAreaView className="h-full bg-gray-100/90">
       {/* Header */}
-      <View className="flex flex-row items-center my-2 ml-5">
+      <View className="flex flex-row items-center my-3 ml-5">
         <TouchableOpacity>
           <Image
             source={images.blankProfilePicture}

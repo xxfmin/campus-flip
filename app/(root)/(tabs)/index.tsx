@@ -28,7 +28,7 @@ export default function Index() {
 
       console.log("Global context updated, navigating to signin...");
       // Navigate back to signin page after successful logout
-      router.push("/(root)/(auth)/signin");
+      router.push("/(auth)/signin");
     } catch (err) {
       console.error("Logout failed:", err);
     }
