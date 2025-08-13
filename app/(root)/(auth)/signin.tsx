@@ -1,4 +1,7 @@
+import { useGlobalContext } from "@/utils/global-provider";
+import { auth } from "@/utils/supabase";
 import { Ionicons } from "@expo/vector-icons";
+import { Redirect, router } from "expo-router";
 import React, { useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -6,6 +9,59 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+
+  const { refetch, loading, isLoggedIn } = useGlobalContext();
+
+  // Redirect if user is already logged in
+  if (!loading && isLoggedIn) {
+    return <Redirect href="/" />;
+  }
+
+  const handleLogin = async () => {
+    setError("");
+    setMessage("");
+
+    // Validation
+    if (!email.trim() || !password.trim()) {
+      setError("Email and password are required");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const result = await auth.signIn({ email: email.trim(), password });
+
+      if (result.error) {
+        let errorMessage = "Failed to login";
+
+        if (typeof result.error === "string") {
+          errorMessage = result.error;
+        } else if (
+          result.error &&
+          typeof result.error === "object" &&
+          "message" in result.error
+        ) {
+          errorMessage = (result.error as any).message;
+        }
+
+        setError(errorMessage);
+        return;
+      }
+
+      if (result.data) {
+        router.push("/");
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      setError("Failed to login. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <SafeAreaView className="bg-cream h-full">
@@ -23,6 +79,23 @@ const SignIn = () => {
             From Students, For Students
           </Text>
         </View>
+
+        {/* Error/Message Display */}
+        {error ? (
+          <View className="mb-4 p-3 bg-red-100 rounded-lg border border-red-300">
+            <Text className="text-red-600 font-worksans-medium text-center">
+              {error}
+            </Text>
+          </View>
+        ) : null}
+
+        {message ? (
+          <View className="mb-4 p-3 bg-green-100 rounded-lg border border-green-300">
+            <Text className="text-green-600 font-worksans-medium text-center">
+              {message}
+            </Text>
+          </View>
+        ) : null}
 
         {/* Email Input */}
         <View className="mb-6">
@@ -81,9 +154,13 @@ const SignIn = () => {
         </View>
 
         {/* Login Button */}
-        <TouchableOpacity className="bg-orange rounded-2xl py-5 mb-12 shadow-sm">
+        <TouchableOpacity
+          className={`rounded-2xl py-5 mb-12 shadow-sm ${isSubmitting ? "bg-gray-400" : "bg-orange"}`}
+          onPress={handleLogin}
+          disabled={isSubmitting}
+        >
           <Text className="text-center font-worksans-bold text-white text-lg">
-            Login
+            {isSubmitting ? "Logging in..." : "Login"}
           </Text>
         </TouchableOpacity>
 
@@ -92,7 +169,7 @@ const SignIn = () => {
           <Text className="font-worksans text-blue text-base">
             Don't have an account?{" "}
           </Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push("/signup")}>
             <Text className="font-worksans-bold text-orange text-base">
               Create an account
             </Text>
