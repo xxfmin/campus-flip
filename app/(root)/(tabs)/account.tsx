@@ -3,7 +3,7 @@ import images from "@/constants/images";
 import { useGlobalContext } from "@/utils/global-provider";
 import { auth } from "@/utils/supabase";
 import { router } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import {
   Alert,
   Image,
@@ -46,16 +46,29 @@ const AccountItem = ({ icon, title, subtitle, onPress }: AccountItemProps) => {
 
 const Account = () => {
   const { user, profile, refetch } = useGlobalContext();
+  const [imageError, setImageError] = useState(false);
 
   const handleLogout = async () => {
-    const result = await auth.signOut();
+    Alert.alert("Sign Out", "Are you sure you want to sign out?", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Sign Out",
+        style: "destructive",
+        onPress: async () => {
+          const result = await auth.signOut();
 
-    if (result.error) {
-      Alert.alert("Error", "An error occured while logging out");
-    } else {
-      await refetch();
-      router.replace("/(auth)/signin");
-    }
+          if (result.error) {
+            Alert.alert("Error", "An error occurred while logging out");
+          } else {
+            await refetch();
+            router.replace("/(auth)/signin");
+          }
+        },
+      },
+    ]);
   };
 
   return (
@@ -64,16 +77,19 @@ const Account = () => {
       <View className="flex flex-row items-center my-3 ml-5">
         <TouchableOpacity>
           <Image
-            source={images.blankProfilePicture}
+            source={
+              profile?.profile_picture && !imageError
+                ? { uri: profile.profile_picture }
+                : images.blankProfilePicture
+            }
             className="size-14 rounded-full"
+            onError={() => setImageError(true)}
+            onLoad={() => setImageError(false)}
           />
         </TouchableOpacity>
         <TouchableOpacity className="flex flex-col pl-4 justify-center">
           <Text className="text-2xl font-worksans-bold text-blue">
-            {profile?.name ||
-              (user?.user_metadata?.first_name && user?.user_metadata?.last_name
-                ? `${user.user_metadata.first_name} ${user.user_metadata.last_name}`
-                : user?.email || "User")}
+            {profile?.name || "User"}
           </Text>
           <Text className="text-sm font-worksans">View profile 〉</Text>
         </TouchableOpacity>

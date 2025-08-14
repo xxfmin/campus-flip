@@ -54,7 +54,15 @@ const SignIn = () => {
 
       if (result.data) {
         await refetch();
-        router.replace("/(root)/(tabs)");
+        // Check if user has onboarded, if not, redirect to onboarding
+        const { data: profileData } = await auth.getUserProfile(
+          result.data.user.id
+        );
+        if (profileData?.hasOnboarded) {
+          router.replace("/(root)/(tabs)");
+        } else {
+          router.replace("/(onboarding)");
+        }
       }
     } catch (err) {
       console.error("Login error:", err);

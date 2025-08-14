@@ -3,7 +3,7 @@ import { Redirect, Slot } from "expo-router";
 import { ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function AppLayout() {
+export default function OnboardingLayout() {
   const { loading, isLoggedIn, profile } = useGlobalContext();
 
   if (loading) {
@@ -18,9 +18,9 @@ export default function AppLayout() {
     return <Redirect href="/(auth)/signin" />;
   }
 
-  // Check if user has onboarded, if not, redirect to onboarding
-  if (!profile?.hasOnboarded) {
-    return <Redirect href="/(onboarding)" />;
+  // If user has already onboarded, redirect to main app
+  if (profile?.hasOnboarded) {
+    return <Redirect href="/(root)/(tabs)" />;
   }
 
   return <Slot />;

@@ -70,6 +70,7 @@ export const auth = {
         const { error: profileError } = await supabase.from("Profiles").insert({
           id: data.user.id,
           name: `${firstName} ${lastName}`,
+          hasOnboarded: false,
           created_at: new Date().toISOString(),
         });
 
@@ -265,6 +266,35 @@ export const auth = {
       const { data, error } = await supabase.auth.updateUser({
         data: updates,
       });
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      return { data: null, error };
+    }
+  },
+
+  // Update profile in profiles table
+  async updateProfileData(
+    userId: string,
+    profileData: {
+      name?: string;
+      username?: string;
+      bio?: string;
+      profile_picture?: string;
+      hasOnboarded?: boolean;
+    }
+  ) {
+    try {
+      const { data, error } = await supabase
+        .from("Profiles")
+        .update({
+          ...profileData,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", userId)
+        .select()
+        .single();
+
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
