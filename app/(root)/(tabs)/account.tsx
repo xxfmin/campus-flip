@@ -75,7 +75,7 @@ const Account = () => {
     <SafeAreaView className="h-full bg-gray-100/90">
       {/* Header */}
       <View className="flex flex-row items-center my-3 ml-5">
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push("/profile")}>
           <Image
             source={
               profile?.profile_picture && !imageError
@@ -87,7 +87,10 @@ const Account = () => {
             onLoad={() => setImageError(false)}
           />
         </TouchableOpacity>
-        <TouchableOpacity className="flex flex-col pl-4 justify-center">
+        <TouchableOpacity
+          className="flex flex-col pl-4 justify-center"
+          onPress={() => router.push("/profile")}
+        >
           <Text className="text-2xl font-worksans-bold text-blue">
             {profile?.name || "User"}
           </Text>
